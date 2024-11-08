@@ -1,51 +1,68 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Req,
-  UseGuards,
-  UsePipes,
-} from '@nestjs/common';
+import { Body, Controller, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { USERS_MESSAGES } from 'src/constants/messages';
-import { ERROR } from 'src/constants/error';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { Request } from 'express';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtRefreshAuthGuard } from './guards/jwt-refresh.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { AuthInfo } from 'src/constants/token';
 
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UsePipes(ERROR.UNPROCESSABLE_ENTITY_EXCEPTION)
-  @Post('register')
+  @MessagePattern('register')
   async register(@Body() registerDto: RegisterDto) {
     const user = await this.authService.register(registerDto);
     return {
       message: USERS_MESSAGES.REGISTER_SUCCESS,
-      data: {
-        user,
-      },
+      data: user,
     };
   }
 
   @UseGuards(LocalAuthGuard)
-  @UsePipes(ERROR.UNPROCESSABLE_ENTITY_EXCEPTION)
   @MessagePattern('login')
-  async login(@Req() req: Request) {
-    // const { accessToken, refreshToken } = await this.authService.loginService(
-    //   req.user,
-    // );
-    // return {
-    //   message: USERS_MESSAGES.LOGIN_SUCCESSFULLY,
-    //   data: {
-    //     access_token: accessToken,
-    //     refresh_token: refreshToken,
-    //     user: req.user,
-    //   },
-    // };
-    // console.log('Đây là Payload nè:', payload);
-    console.log(req.user);
+  async login(@Payload() payload: any) {
+    const { accessToken, refreshToken } = await this.authService.login(
+      payload.user,
+    );
+    return {
+      message: USERS_MESSAGES.LOGIN_SUCCESSFULLY,
+      data: {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        user: payload.user,
+      },
+    };
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @MessagePattern('logout')
+  async logout(@Payload() payload: any) {
+    return await this.authService.logout(payload);
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @MessagePattern('refresh-token')
+  async refreshToken(@Payload() payload: any) {
+    return await this.authService.refreshToken(payload);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @MessagePattern('authentication')
+  async authentication(
+    @Payload()
+    payload: AuthInfo,
+  ) {
+    return payload;
+  }
+
+  @UseGuards(RolesGuard)
+  @MessagePattern('roles-guard')
+  async rolesGuard() {
+    return true;
   }
 }

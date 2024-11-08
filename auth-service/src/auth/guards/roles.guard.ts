@@ -2,31 +2,34 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
+  HttpStatus,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from 'prisma/prisma.service';
+import { USERS_MESSAGES } from 'src/constants/messages';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    private prismaService: PrismaService,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
   async canActivate(context: ExecutionContext) {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    const request = context.switchToHttp().getRequest();
-    if (request.user) {
-      const user = await this.prismaService.users.findUnique({
-        where: { user_id: request.user.user_id },
+    const { roles, user_id } = context.switchToRpc().getData();
+    const user = await this.prismaService.users.findUnique({
+      where: { user_id },
+    });
+    if (!user) {
+      throw new RpcException({
+        message: USERS_MESSAGES.USER_NOT_FOUND,
+        status: HttpStatus.UNAUTHORIZED,
       });
-      const isForbidden = roles.includes(user.role);
-      if (!isForbidden)
-        throw new ForbiddenException({
-          message: 'Không có quyền truy cập vào chức năng này',
-        });
-      return true;
     }
-    return false;
+    const isForbidden = roles.includes(user.role);
+    if (!isForbidden) {
+      throw new RpcException({
+        message: USERS_MESSAGES.DO_NOT_HAVE_PERMISSION,
+        status: HttpStatus.FORBIDDEN,
+      });
+    }
+
+    return true;
   }
 }
