@@ -65,4 +65,5 @@ export const USERS_MESSAGES = {
   DATE_OF_BIRTH_MUST_BE_A_VALID_DATE: 'Ngày sinh phải là một ngày hợp lệ',
   DATE_OF_BIRTH_IS_REQUIRED: 'Ngày sinh là bắt buộc',
   ERROR_WHILE_COMPRESSING_IMAGES: 'Đã có lỗi trong quá trình nén hình ảnh',
+  ERROR: 'Lỗi',
 } as const;

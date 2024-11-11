@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
+import { ShippingService } from './shipping.service';
+import { ShippingController } from './shipping.controller';
 import { PrismaService } from 'prisma/prisma.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
-  controllers: [UserController],
-  providers: [UserService, PrismaService],
+  controllers: [ShippingController],
+  providers: [ShippingService, PrismaService],
   imports: [
     ClientsModule.register([
       {
-        name: 'AUTH_SERVICE',
+        name: 'PRODUCT_SERVICE',
         transport: Transport.RMQ,
         options: {
           urls: ['amqp://admin:1234@localhost:5672'],
-          queue: 'auth_queue',
+          queue: 'product_queue',
           queueOptions: {
             durable: true,
           },
@@ -23,4 +23,4 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
 })
-export class UserModule {}
+export class ShippingModule {}

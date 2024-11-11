@@ -42,4 +42,40 @@ export class PurchaseService {
       purchase_id,
     });
   }
+
+  async deletePurchases(authHeader: string, purchase_id: number[]) {
+    const authInfo = await this.authService.authentication(authHeader);
+    const { user_id } = authInfo.decodeAccessToken;
+    await this.authService.rolesGuard([UserRole.USER], user_id);
+    return await wrapRequestHandler(this.purchaseService, 'delete-purchases', {
+      authInfo,
+      purchase_id,
+    });
+  }
+
+  async updatePurchase(
+    authHeader: string,
+    purchase_id: number,
+    buy_count: number,
+  ) {
+    const authInfo = await this.authService.authentication(authHeader);
+    const { user_id } = authInfo.decodeAccessToken;
+    await this.authService.rolesGuard([UserRole.USER], user_id);
+    return await wrapRequestHandler(this.purchaseService, 'update-purchase', {
+      authInfo,
+      purchase_id,
+      buy_count,
+    });
+  }
+
+  // ROLE ADMIN
+  async confirmPurchase(authHeader: string, purchase_id: number) {
+    const authInfo = await this.authService.authentication(authHeader);
+    const { user_id } = authInfo.decodeAccessToken;
+    await this.authService.rolesGuard([UserRole.ADMIN], user_id);
+    return await wrapRequestHandler(this.purchaseService, 'confirm-purchase', {
+      authInfo,
+      purchase_id,
+    });
+  }
 }

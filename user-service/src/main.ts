@@ -1,8 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { initFolder } from './utils/uploads/file';
-
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
@@ -17,7 +15,6 @@ async function bootstrap() {
       },
     },
   );
-  initFolder();
   await app.listen();
 }
 bootstrap();

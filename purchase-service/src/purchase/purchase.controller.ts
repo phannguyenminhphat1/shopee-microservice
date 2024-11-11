@@ -32,4 +32,35 @@ export class PurchaseController {
   ) {
     return await this.purchaseService.buyProducts(payload);
   }
+
+  @MessagePattern('delete-purchases')
+  async deletePurchases(
+    @Payload() payload: { authInfo: AuthInfo; purchase_id: number[] },
+  ) {
+    return await this.purchaseService.deletePurchases(payload);
+  }
+
+  @MessagePattern('update-purchase')
+  async updatePurchase(
+    @Payload()
+    payload: {
+      authInfo: AuthInfo;
+      purchase_id: number;
+      buy_count: number;
+    },
+  ) {
+    return await this.purchaseService.updatePurchase(payload);
+  }
+
+  // ROLE ADMIN
+  @MessagePattern('confirm-purchase')
+  async confirmPurchase(
+    @Payload()
+    payload: {
+      authInfo: AuthInfo;
+      purchase_id: number;
+    },
+  ) {
+    return await this.purchaseService.confirmPurchase(payload);
+  }
 }

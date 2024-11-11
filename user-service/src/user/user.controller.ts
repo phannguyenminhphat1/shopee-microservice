@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post, Put, UploadedFile } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from 'src/utils/decorators/user.decorator';
 import { users } from '@prisma/client';
 import { UpdateMeDto } from './dto/update-me.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -15,21 +14,34 @@ export class UserController {
     return await this.userService.getMe(payload);
   }
 
-  // @Put('update-me')
-  // async updateMe(@User() user: users, @Body() updateMeDto: UpdateMeDto) {
-  //   return await this.userService.updateMe(user, updateMeDto);
-  // }
+  @MessagePattern('update-me')
+  async updateMe(
+    @Payload() payload: { authInfo: AuthInfo; updateMeDto: UpdateMeDto },
+  ) {
+    return await this.userService.updateMe(payload);
+  }
 
-  // @Post('upload-avatar')
-  // async uploadAvatar(@UploadedFile() file: Express.Multer.File) {
-  //   return await this.userService.uploadAvatar(file);
-  // }
+  @MessagePattern('change-password')
+  async changePassword(
+    @Payload()
+    payload: {
+      authInfo: AuthInfo;
+      changePasswordDto: ChangePasswordDto;
+    },
+  ) {
+    return await this.userService.changePassword(payload);
+  }
 
-  // @Put('change-password')
-  // async changePassword(
-  //   @User() user: users,
-  //   @Body() changePasswordDto: ChangePasswordDto,
-  // ) {
-  //   return await this.userService.changePassword(user, changePasswordDto);
-  // }
+  @MessagePattern('upload-avatar')
+  async uploadAvatar(
+    @Payload()
+    payload: {
+      result: any;
+      input: string;
+      output: string;
+      file: Express.Multer.File;
+    },
+  ) {
+    return await this.userService.uploadAvatar(payload);
+  }
 }

@@ -65,4 +65,9 @@ export class AuthController {
   async rolesGuard() {
     return true;
   }
+
+  @MessagePattern('hash-password')
+  async hashPassword(@Payload() payload: { new_password: string }) {
+    return await this.authService.hashPassword(payload.new_password);
+  }
 }

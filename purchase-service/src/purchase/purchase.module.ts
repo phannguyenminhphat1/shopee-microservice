@@ -34,6 +34,19 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         },
       },
     ]),
+    ClientsModule.register([
+      {
+        name: 'SHIPPING_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:1234@localhost:5672'],
+          queue: 'shipping_queue',
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
+    ]),
   ],
 })
 export class PurchaseModule {}

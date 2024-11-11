@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 
@@ -28,5 +37,35 @@ export class PurchaseController {
     @Body('purchase_id') purchase_id: number[],
   ) {
     return await this.purchaseService.buyProducts(authHeader, purchase_id);
+  }
+
+  @Delete('delete-purchases')
+  async deletePurchases(
+    @Headers('authorization') authHeader: string,
+    @Body('purchase_id') purchase_id: number[],
+  ) {
+    return await this.purchaseService.deletePurchases(authHeader, purchase_id);
+  }
+
+  @Put('update-purchase')
+  async updatePurchase(
+    @Headers('authorization') authHeader: string,
+    @Body('purchase_id') purchase_id: number,
+    @Body('buy_count') buy_count: number,
+  ) {
+    return await this.purchaseService.updatePurchase(
+      authHeader,
+      purchase_id,
+      buy_count,
+    );
+  }
+
+  // ROLE ADMIN
+  @Post('confirm-purchase')
+  async confirmPurchase(
+    @Headers('authorization') authHeader: string,
+    @Body('purchase_id') purchase_id: number,
+  ) {
+    return await this.purchaseService.confirmPurchase(authHeader, purchase_id);
   }
 }
