@@ -1,0 +1,73 @@
+version: "3.8"
+services:
+  # API GATEWAY
+  api-gateway:
+    container_name: api-gateway
+    build: ./api-gateway
+    ports:
+      - 8080:8080
+    networks:
+      - node-network
+
+  # AUTH_SERVICE
+  auth-service:
+    container_name: auth-service
+    build: ./auth-service
+    environment:
+      - DATABASE_URL=postgresql://postgres:1234@some-postgres/db_shopee?schema=public
+      - JWT_SECRET=MinhPhat@1234dasjdhb
+      - JWT_REFRESH_SECRET=m{Ut,5*E}G2Jr7Mv%~6Cpw
+    networks:
+      - node-network
+
+  # CATTEGORY_SERVICE
+  category-service:
+    container_name: category-service
+    build: ./category-service
+    environment:
+      - DATABASE_URL=postgresql://postgres:1234@some-postgres/db_shopee?schema=public
+    networks:
+      - node-network
+
+  # PRODUCT_SERVICE
+  product-service:
+    container_name: product-service
+    build: ./product-service
+    environment:
+      - DATABASE_URL=postgresql://postgres:1234@some-postgres/db_shopee?schema=public
+    networks:
+      - node-network
+
+  # PURCHASE_SERVICE
+  purchase-service:
+    container_name: purchase-service
+    build: ./purchase-service
+    environment:
+      - DATABASE_URL=postgresql://postgres:1234@some-postgres/db_shopee?schema=public
+    networks:
+      - node-network
+
+  # SHIPPING_SERVICE
+  shipping-service:
+    container_name: shipping-service
+    build: ./shipping-service
+    environment:
+      - DATABASE_URL=postgresql://postgres:1234@some-postgres/db_shopee?schema=public
+    networks:
+      - node-network
+
+  # USER_SERVICE
+  user-service:
+    container_name: user-service
+    build: ./user-service
+    environment:
+      - DATABASE_URL=postgresql://postgres:1234@some-postgres/db_shopee?schema=public
+      - CLOUNDINARY_NAME=dy2bmisbi
+      - CLOUNDINARY_API_KEY=857759662565698
+      - CLOUNDINARY_API_SECRET=nNqRkoYVntGhS0HLzjJLpT9UeHU
+      - CLOUNDINARY_DEFAULT_AVATAR=https://res.cloudinary.com/dy2bmisbi/image/upload/v1716211691/default-avatar.jpg
+    networks:
+      - node-network
+networks:
+  node-network:
+    external: true
